@@ -3,7 +3,7 @@ const router = express.Router();
 const Club = require('../models/Club');
 const Event = require('../models/Event');
 
-// Authentication middleware
+
 const authenticate = (req, res, next) => {
   if (req.session.isAdmin) {
     next();
@@ -12,7 +12,7 @@ const authenticate = (req, res, next) => {
   }
 };
 
-// Image display routes
+
 router.get('/image/club/:id', async (req, res) => {
   try {
     const club = await Club.findById(req.params.id);
@@ -41,11 +41,11 @@ router.get('/image/event/:id', async (req, res) => {
   }
 });
 
-// Login routes
+
 router.get('/login', (req, res) => {
   res.render('login', { 
     error: null,
-    currentPage: 'login'  // Add this line
+    currentPage: 'login'  
   });
 });
 
@@ -56,7 +56,7 @@ router.post('/login', (req, res) => {
   } else {
     res.render('login', { 
       error: 'Invalid credentials',
-      currentPage: 'login'  // Add this line
+      currentPage: 'login'  
     });
   }
 });
@@ -66,7 +66,7 @@ router.get('/logout', (req, res) => {
   res.redirect('/admin/login');
 });
 
-// Admin dashboard
+
 router.get('/', authenticate, async (req, res) => {
   try {
     const clubs = await Club.find();
@@ -74,7 +74,7 @@ router.get('/', authenticate, async (req, res) => {
     res.render('admin/dashboard', { 
       clubs, 
       events,
-      currentPage: 'dashboard'  // Add this
+      currentPage: 'dashboard'  
     });
   } catch (error) {
     res.status(500).send('Error loading dashboard');
@@ -82,13 +82,13 @@ router.get('/', authenticate, async (req, res) => {
 });
 
 
-// Club management routes
+
 router.get('/clubs', authenticate, async (req, res) => {
   try {
     const clubs = await Club.find();
     res.render('admin/clubs', { 
       clubs,
-      currentPage: 'clubs'  // Add this
+      currentPage: 'clubs'  
     });
   } catch (error) {
     res.status(500).send('Error loading clubs');
@@ -101,7 +101,7 @@ router.post('/clubs', authenticate, async (req, res) => {
     const { name, description } = req.body;
     let logo = {};
     
-    // Handle file upload if present
+
     if (req.files && req.files.logo) {
       const logoFile = req.files.logo;
       logo = {
@@ -130,7 +130,7 @@ router.post('/clubs/:id/delete', authenticate, async (req, res) => {
   }
 });
 
-// Event management routes
+
 router.get('/events', authenticate, async (req, res) => {
   try {
     const events = await Event.find().populate('club');
@@ -138,7 +138,7 @@ router.get('/events', authenticate, async (req, res) => {
     res.render('admin/events', { 
       events, 
       clubs,
-      currentPage: 'events'  // Add this
+      currentPage: 'events'  
     });
   } catch (error) {
     res.status(500).send('Error loading events');
@@ -150,7 +150,7 @@ router.post('/events', authenticate, async (req, res) => {
     const { name, description, club, venue, date, time, type, registration_link } = req.body;
     let poster = {};
     
-    // Handle file upload if present
+
     if (req.files && req.files.poster) {
       const posterFile = req.files.poster;
       poster = {
@@ -187,7 +187,7 @@ router.get('/events/:id/edit', authenticate, async (req, res) => {
     res.render('admin/edit-event', { 
       event, 
       clubs,
-      currentPage: 'events'  // This line is crucial
+      currentPage: 'events'  
     });
   } catch (error) {
     res.status(500).send('Error loading event for editing');
@@ -208,7 +208,7 @@ router.post('/events/:id/edit', authenticate, async (req, res) => {
       registration_link
     };
     
-    // Handle file upload if present
+
     if (req.files && req.files.poster) {
       const posterFile = req.files.poster;
       updateData.poster = {
@@ -221,13 +221,13 @@ router.post('/events/:id/edit', authenticate, async (req, res) => {
     await Event.findByIdAndUpdate(req.params.id, updateData);
     res.redirect('/admin/events');
   } catch (error) {
-    // If there's an error, re-render the edit page with the currentPage variable
+
     const event = await Event.findById(req.params.id).populate('club');
     const clubs = await Club.find();
     res.render('admin/edit-event', { 
       event, 
       clubs,
-      currentPage: 'events',  // Add this line
+      currentPage: 'events',  
       error: 'Error updating event'
     });
   }
