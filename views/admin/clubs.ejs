@@ -1,0 +1,142 @@
+<%- include('../partials/header', { currentPage: 'clubs' }) %>
+
+<h1 class="text-3xl font-bold text-gray-800 mb-6">Club Management</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <!-- Add New Club -->
+  <div class="bg-white rounded-2xl shadow-md p-6">
+    <h5 class="text-xl font-semibold mb-4">Add New Club</h5>
+    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">Club Name</label>
+        <input type="text" id="name" name="name" required
+          class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
+      </div>
+
+      <div>
+        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+        <textarea id="description" name="description" rows="3" required
+          class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2"></textarea>
+      </div>
+
+      <div>
+        <label for="logo" class="block text-sm font-medium text-gray-700">Club Logo</label>
+        <input type="file" id="logo" name="logo" accept="image/*"
+          class="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 
+          file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
+        <p class="mt-1 text-xs text-gray-500">Max file size: 5MB. Supported formats: JPG, PNG, GIF, WEBP</p>
+      </div>
+
+      <button type="submit"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
+        Create Club
+      </button>
+    </form>
+  </div>
+
+  <!-- Existing Clubs -->
+  <div class="md:col-span-2 bg-white rounded-2xl shadow-md p-6">
+    <h5 class="text-xl font-semibold mb-4">Existing Clubs</h5>
+    <% if (clubs.length > 0) { %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-700 border">
+          <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+            <tr>
+              <th class="px-4 py-2">Logo</th>
+              <th class="px-4 py-2">Name</th>
+              <th class="px-4 py-2">Description</th>
+              <th class="px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% clubs.forEach(club => { %>
+              <tr class="border-t hover:bg-gray-50">
+                <td class="px-4 py-2">
+                  <% if (club.logo && club.logo.data) { %>
+                    <img src="/admin/image/club/<%= club._id %>" alt="<%= club.name %>" 
+                      class="club-logo w-12 h-12 object-cover rounded-full border cursor-pointer" 
+                      title="Click to view larger">
+                  <% } else { %>
+                    <span class="text-gray-400 italic">No logo</span>
+                  <% } %>
+                </td>
+                <td class="px-4 py-2 font-medium"><%= club.name %></td>
+                <td class="px-4 py-2"><%= club.description %></td>
+                <td class="px-4 py-2">
+                  <form method="POST" action="/admin/clubs/<%= club._id %>/delete" class="inline">
+                    <button type="submit"
+                      class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-xs font-medium"
+                      onclick="return confirm('Are you sure? This will also delete all events associated with this club.')">
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="text-center py-8">
+        <div class="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-gray-100 text-gray-500">
+          <i class="bi bi-people text-3xl"></i>
+        </div>
+        <h5 class="mt-4 text-lg font-semibold text-gray-700">No clubs yet</h5>
+        <p class="text-gray-500 text-sm">Create your first club using the form on the left.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Modal for larger image view -->
+<div class="fixed inset-0 hidden bg-black bg-opacity-60 items-center justify-center z-50" id="imageModal">
+  <div class="bg-white rounded-2xl shadow-lg max-w-2xl w-full p-4 relative">
+    <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeModal">&times;</button>
+    <h5 class="text-lg font-semibold mb-4">Club Logo</h5>
+    <div class="text-center">
+      <img id="modalImage" src="" alt="" class="max-h-[70vh] mx-auto rounded-lg">
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const clubLogos = document.querySelectorAll('.club-logo');
+  const imageModal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  const closeModal = document.getElementById('closeModal');
+
+  clubLogos.forEach(logo => {
+    logo.addEventListener('click', function() {
+      modalImage.src = this.src;
+      imageModal.classList.remove('hidden');
+      imageModal.classList.add('flex');
+    });
+  });
+
+  closeModal.addEventListener('click', () => {
+    imageModal.classList.add('hidden');
+    imageModal.classList.remove('flex');
+  });
+
+  // File validation
+  const fileInput = document.getElementById('logo');
+  fileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert('File size must be less than 5MB');
+        this.value = '';
+      }
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please select a valid image file (JPG, PNG, GIF, WEBP)');
+        this.value = '';
+      }
+    }
+  });
+});
+</script>
+
+<%- include('../partials/footer') %>

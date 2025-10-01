@@ -1,0 +1,182 @@
+<%- include('../partials/header', { currentPage: 'dashboard' }) %>
+
+<!-- Header -->
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+    <p class="text-gray-600 mt-2">Welcome to College Fest Admin Panel</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="stat-card">
+        <div class="flex items-center">
+            <div class="p-3 bg-blue-100 rounded-lg">
+                <i class="fas fa-users text-blue-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Clubs</p>
+                <h3 class="text-2xl font-bold text-gray-900"><%= clubs.length %></h3>
+            </div>
+        </div>
+        <div class="mt-4">
+            <span class="text-green-600 text-sm font-medium">
+                <i class="fas fa-arrow-up mr-1"></i>
+                Active
+            </span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="flex items-center">
+            <div class="p-3 bg-green-100 rounded-lg">
+                <i class="fas fa-calendar-alt text-green-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Events</p>
+                <h3 class="text-2xl font-bold text-gray-900"><%= events.length %></h3>
+            </div>
+        </div>
+        <div class="mt-4">
+            <span class="text-green-600 text-sm font-medium">
+                <i class="fas fa-arrow-up mr-1"></i>
+                Organized
+            </span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="flex items-center">
+            <div class="p-3 bg-purple-100 rounded-lg">
+                <i class="fas fa-gamepad text-purple-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Games</p>
+                <h3 class="text-2xl font-bold text-gray-900">
+                    <%= events.filter(e => e.type === 'game').length %>
+                </h3>
+            </div>
+        </div>
+        <div class="mt-4">
+            <span class="text-green-600 text-sm font-medium">
+                <i class="fas fa-trophy mr-1"></i>
+                Competitive
+            </span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="flex items-center">
+            <div class="p-3 bg-orange-100 rounded-lg">
+                <i class="fas fa-music text-orange-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Upcoming Events</p>
+                <h3 class="text-2xl font-bold text-gray-900">
+                    <%= events.filter(e => new Date(e.date) > new Date()).length %>
+                </h3>
+            </div>
+        </div>
+        <div class="mt-4">
+            <span class="text-blue-600 text-sm font-medium">
+                <i class="fas fa-clock mr-1"></i>
+                Scheduled
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Events and Quick Actions -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Recent Events -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="p-6 border-b border-gray-100">
+            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="fas fa-clock text-gray-500 mr-2"></i>
+                Upcoming Events
+            </h2>
+        </div>
+        <div class="p-6">
+            <% if (events.length > 0) { %>
+                <div class="space-y-4">
+                    <% events.slice(0, 5).forEach(event => { %>
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                    <i class="fas fa-<%= event.type === 'event' ? 'calendar' : 'gamepad' %> text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900"><%= event.name %></h4>
+                                    <p class="text-sm text-gray-500">
+                                        <%= new Date(event.date).toLocaleDateString() %> • <%= event.time %>
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium 
+                                <%= event.type === 'event' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' %>">
+                                <%= event.type %>
+                            </span>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-8">
+                    <i class="fas fa-calendar-plus text-4xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No events yet</h3>
+                    <p class="text-gray-500 mb-4">Start by creating your first event</p>
+                    <a href="/admin/events" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium inline-flex items-center">
+                        <i class="fas fa-plus mr-2"></i>
+                        Create Event
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="p-6 border-b border-gray-100">
+            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+                Quick Actions
+            </h2>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 gap-4">
+                <a href="/admin/events" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200 group">
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4 group-hover:bg-blue-200">
+                        <i class="fas fa-plus text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900">Create New Event</h4>
+                        <p class="text-sm text-gray-600">Add a new event or game</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
+                </a>
+
+                <a href="/admin/clubs" class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-200 group">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4 group-hover:bg-green-200">
+                        <i class="fas fa-users text-green-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900">Manage Clubs</h4>
+                        <p class="text-sm text-gray-600">View and organize clubs</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
+                </a>
+
+                <a href="/admin/events" class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-200 group">
+                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-4 group-hover:bg-purple-200">
+                        <i class="fas fa-calendar-check text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900">View All Events</h4>
+                        <p class="text-sm text-gray-600">See complete event list</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

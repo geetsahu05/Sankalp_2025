@@ -1,0 +1,24 @@
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.12.0/cdn.min.js"></script>
+    <script>
+        // Mobile sidebar toggle (if needed in future)
+        function toggleSidebar() {
+            const sidebar = document.querySelector('aside');
+            sidebar.classList.toggle('hidden');
+        }
+        
+        // Tooltip initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltips = document.querySelectorAll('[data-tooltip]');
+            tooltips.forEach(tooltip => {
+                tooltip.addEventListener('mouseenter', function(e) {
+                    // Tooltip implementation can be added here
+                });
+            });
+        });
+    </script>
+</body>
+</html>
